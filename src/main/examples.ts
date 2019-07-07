@@ -111,6 +111,18 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         ]
     },
     {
+        name: "not like",
+        code: "SELECT * FROM foo WHERE name NOT LIKE 'Hans'",
+        quoteType: lexer.QuoteType.DOUBLE_QUOTED_STRINGS,
+        expectedTokens: [
+            {kind: "select", contents: "SELECT"}, {kind: "*", contents: "*"},
+            {kind: "from", contents: "FROM"}, {kind: "identifier", contents: "foo"},
+            {kind: "where", contents: "WHERE"}, {kind: "identifier", contents: "name"},
+            {kind: "not", contents: "NOT"}, {kind: "like", contents: "LIKE"},
+            {kind: "string", contents: "Hans"}
+        ]
+    },
+    {
         name: "unclosed string",
         code: "SELECT * FROM foo WHERE name = 'Hans",
         quoteType: lexer.QuoteType.DOUBLE_QUOTED_STRINGS,
