@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "mocha gen/js/test/",
+    "lint": "tslint --project .",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "node-ts": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "mocha": "^6.1.4",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
+  }
+}

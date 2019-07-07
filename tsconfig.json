@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "umd",
+        "target": "es2019",
+        "strict": true,
+        "outDir": "gen/js"
+    },
+    "include": ["src/**/*"]
+}
