@@ -26,7 +26,8 @@ class SyntaxError extends Error {
 
     constructor(actual: lexer.Token, expected: string) {
         super();
-        this.message = `Unexpected '${actual.contents}', expected ${expected}`;
+        const prettyActual = actual.kind === "eof" ? "end of input" : `input '${actual.contents}'`;
+        this.message = `Unexpected ${prettyActual}, expected ${expected}`;
         this.location = actual.location;
     }
 }
@@ -49,11 +50,11 @@ class Parser {
         const commands = [];
         while (this.tokenIndex < this.tokens.length) {
             // When there's a syntax error in a command, we ignore that command and skip to the next
-            // command by skipping all input until the next ";"-token or the end of file.
+            // command by skipping all input until the next ";"-token or the end of input.
             try {
                 commands.push(this.parseCommand());
                 if (!this.eof()) {
-                    this.expect(";", "';' or the end of file");
+                    this.expect(";", "';' or the end of input");
                 }
             } catch (error) {
                 if (error instanceof SyntaxError) {
@@ -126,7 +127,7 @@ class Parser {
     private parseSelect(): ast.SelectCommand {
         const selectKeyword = this.readToken();
         const columnNames = this.parseColumnNames();
-        this.expect("from", "'FROM'");
+        this.expect("from", "FROM clause");
         const table = this.parseTableName();
         const location = this.loc(selectKeyword, table);
         return new ast.SelectCommand(table, columnNames, undefined, location);

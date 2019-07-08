@@ -150,7 +150,7 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         ],
         // expectedErrors: [
         //     {
-        //         message: "Unexpected 'WHERE', expected FROM clause",
+        //         message: "Unexpected input 'WHERE', expected FROM clause",
         //         location: {from: {line: 1, column: 9}, to: {line: 1, column: 14}}
         //     }
         // ]
