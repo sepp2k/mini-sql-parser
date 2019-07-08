@@ -1,7 +1,10 @@
 /* tslint:disable:no-console */
+import * as sourceMapSupport from "source-map-support";
 
 import {examples} from "./examples";
 import * as lexer from "./lexer";
+
+sourceMapSupport.install();
 
 for (const example of examples) {
     const quoteType = example.quoteType;

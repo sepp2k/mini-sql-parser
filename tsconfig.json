@@ -3,7 +3,8 @@
         "module": "umd",
         "target": "es2019",
         "strict": true,
-        "outDir": "gen/js"
+        "outDir": "gen/js",
+        "sourceMap": true
     },
     "include": ["src/**/*"]
 }
