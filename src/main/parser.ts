@@ -125,11 +125,11 @@ class Parser {
 
     private parseSelect(): ast.SelectCommand {
         const selectKeyword = this.readToken();
-        this.expect("*", "'*'");
+        const columnNames = this.parseColumnNames();
         this.expect("from", "'FROM'");
         const table = this.parseTableName();
         const location = this.loc(selectKeyword, table);
-        return new ast.SelectCommand(table, "*", undefined, location);
+        return new ast.SelectCommand(table, columnNames, undefined, location);
     }
 
     private parseInsert(): ast.InsertCommand {
@@ -138,6 +138,22 @@ class Parser {
 
     private parseDelete(): ast.DeleteCommand {
         throw new SyntaxError(this.readToken(), "unimplemented");
+    }
+
+    private parseColumnNames(): string[]|"*" {
+        if (this.peekToken().kind === "*") {
+            this.readToken();
+            return "*";
+        } else {
+            const firstId = this.expect("identifier", "identifier or '*'");
+            const ids = [firstId.contents];
+            while (this.peekToken().kind === ",") {
+                this.readToken();
+                const id = this.expect("identifier", "identifier or '*'");
+                ids.push(id.contents);
+            }
+            return ids;
+        }
     }
 
     private parseTableName(): ast.TableName {
