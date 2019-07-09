@@ -1,7 +1,7 @@
 import * as assert from "assert";
-import {examples} from "../main/examples";
-import * as lexer from "../main/lexer";
-import * as parser from "../main/parser";
+import {examples} from "../lib/examples";
+import * as lexer from "../lib/lexer";
+import * as parser from "../lib/parser";
 
 // Filter out source locations and object prototypes when serializing tokens and AST nodes
 // This way I don't have to write down locations for all the tokens and AST nodes

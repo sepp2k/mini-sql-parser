@@ -1,9 +1,9 @@
 /* tslint:disable:no-console */
 import * as sourceMapSupport from "source-map-support";
 
-import {examples} from "./examples";
-import * as lexer from "./lexer";
-import * as parser from "./parser";
+import {examples} from "../lib/examples";
+import * as lexer from "../lib/lexer";
+import * as parser from "../lib/parser";
 
 sourceMapSupport.install();
 
