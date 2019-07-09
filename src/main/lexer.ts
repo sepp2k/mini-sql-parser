@@ -57,8 +57,7 @@ export enum QuoteType {
 }
 
 /**
- * Turn the source code into a list of tokens. Whitespace (including Unicode spaces) is ignored.
- * Comments are not supported.
+ * Turn the source code into a list of tokens. Whitespace (including Unicode spaces) and comments are ignored.
  *
  * @param source The source code
  * @param quoteType ANSI_QUOTES if double quotes are used for delimited identifiers or
@@ -166,6 +165,28 @@ export function lex(source: string, quoteType: QuoteType): Result {
         lastPoint = {line, column};
     }
 
+    function skipLineComment(): void {
+        while (peekChar() !== "\n") {
+            readChar();
+        }
+        // skip the line break
+        readChar();
+        lastPoint = {line, column};
+    }
+
+    function skipBlockComment(): void {
+        // Skip the /*
+        readChar();
+        readChar();
+        while (peekChar() !== "*" || peekChar(1) !== "/") {
+            readChar();
+        }
+        // skip the */
+        readChar();
+        readChar();
+        lastPoint = {line, column};
+    }
+
     while (index < codePoints.length) {
         const current = peekChar();
         const next = peekChar(1);
@@ -182,6 +203,10 @@ export function lex(source: string, quoteType: QuoteType): Result {
                    current === ">" && next === "=") {
             const operator = readChar() + readChar();
             result.tokens.push({kind: operator, contents: operator, location: makeLocation()});
+        } else if (current === "-" && next === "-") {
+            skipLineComment();
+        } else if (current === "/" && next === "*") {
+            skipBlockComment();
         } else {
             // This case covers single-char operators, punctuation and any unknown characters
             // Unknown characters do not cause an error in the lexer, but are simply passed on to

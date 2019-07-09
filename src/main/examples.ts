@@ -16,8 +16,8 @@ export interface Example {
 export const examples: Example[] = [
     {
         name: "operations",
-        code: `USE database1;
-SELECT id, name, address FROM users WHERE is_customer IS NOT NULL ORDER BY created;
+        code: `USE database1; --comment
+SELECT id, name, address FROM users WHERE is_customer IS NOT NULL ORDER BY created/*another comment*/;
 INSERT INTO user_notes (id, \`user id\`, note, created) VALUES (1, 1, "Note 1", NOW());
 DELETE FROM database2.logs WHERE id < 1000;`,
         quoteType: lexer.QuoteType.DOUBLE_QUOTED_STRINGS,
@@ -232,7 +232,7 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         code: "SELECT db.table.column FROM db.table WHERE db.table.column = table.column2",
         quoteType: lexer.QuoteType.DOUBLE_QUOTED_STRINGS,
         expectedTokens: [
-            {kind: "select", contents: "SELECT"}, {kind: "identifier", contents: "db"}, {kind:".", contents: "."},
+            {kind: "select", contents: "SELECT"}, {kind: "identifier", contents: "db"}, {kind: ".", contents: "."},
             {kind: "identifier", contents: "table"}, {kind: ".", contents: "."},
             {kind: "identifier", contents: "column"}, {kind: "from", contents: "FROM"},
             {kind: "identifier", contents: "db"}, {kind: ".", contents: "."}, {kind: "identifier", contents: "table"},
