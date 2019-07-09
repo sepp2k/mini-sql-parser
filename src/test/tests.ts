@@ -2,30 +2,23 @@ import * as assert from "assert";
 import {examples} from "../lib/examples";
 import * as lexer from "../lib/lexer";
 import * as parser from "../lib/parser";
-
-// Filter out source locations and object prototypes when serializing tokens and AST nodes
-// This way I don't have to write down locations for all the tokens and AST nodes
-export function filterKeys(key: string, value: any) {
-    if (key === "location" || key === "prototype") {
-        return undefined;
-    } else {
-        return value;
-    }
-}
+import * as util from "../lib/util";
 
 for (const example of examples) {
     describe(example.name, () => {
         const lexResult = lexer.lex(example.code, example.quoteType);
         const result = parser.parse(lexResult);
         it("should produce the correct sequence of tokens", () => {
-            const expected = JSON.stringify(example.expectedTokens);
-            const actual = JSON.stringify(lexResult.tokens, filterKeys);
+            const expected = util.prettyPrint(example.expectedTokens);
+            const actual = util.prettyPrint(lexResult.tokens);
             assert.equal(actual, expected);
         });
         it("should produce the correct AST", () => {
             // Parse and reserialize the expected AST to get rid of spacing and order differences
-            const expected = JSON.stringify(JSON.parse(example.expectedAst), undefined, 2);
-            const actual = JSON.stringify(result.commands, filterKeys, 2);
+            const expected = util.prettyPrint(JSON.parse(example.expectedAst));
+            // By pretty printing the AST, we also get rid of the location and prototype field,
+            // which is good because we didn't specify those for the expected AST
+            const actual = util.prettyPrint(result.commands);
             assert.equal(actual, expected);
         });
         it("should produce the correct set of warnings", () => {

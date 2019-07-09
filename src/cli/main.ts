@@ -4,17 +4,9 @@ import * as sourceMapSupport from "source-map-support";
 import {examples} from "../lib/examples";
 import * as lexer from "../lib/lexer";
 import * as parser from "../lib/parser";
+import * as util from "../lib/util";
 
 sourceMapSupport.install();
-
-// Filter out source locations and object prototypes when printing tokens and AST nodes
-function filterKeys(key: string, value: any) {
-    if (key === "location" || key === "prototype") {
-        return undefined;
-    } else {
-        return value;
-    }
-}
 
 for (const example of examples) {
     const quoteType = example.quoteType;
@@ -24,12 +16,12 @@ for (const example of examples) {
     console.log(`Source:\n${example.code.trimEnd()}\n`);
     console.log("Tokens:");
     for (const token of lexResult.tokens) {
-        console.log(JSON.stringify(token, filterKeys));
+        console.log(util.prettyPrint(token));
     }
     console.log();
     console.log("AST:");
     for (const command of result.commands) {
-        console.log(JSON.stringify(command, filterKeys, 2));
+        console.log(util.prettyPrint(command));
     }
     console.log(`Warnings: ${JSON.stringify(result.warnings)}`);
     console.log(`Errors: ${JSON.stringify(result.errors)}`);
