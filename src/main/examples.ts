@@ -5,6 +5,9 @@ export interface Example {
     name: string;
     code: string;
     expectedTokens: Array<{kind: string, contents: string}>;
+    // Represent the AST as a JSON string rather than an actual object, so I don't have to define
+    // a variation of the AST type without locations and prototypes
+    expectedAst: string;
     expectedWarnings?: Array<{message: string, location: sourceLocation.Range}>;
     expectedErrors?: Array<{message: string, location: sourceLocation.Range}>;
     quoteType: lexer.QuoteType;
@@ -41,12 +44,47 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "string", contents: "Note 1"}, {kind: ",", contents: ","},
             {kind: "identifier", contents: "NOW"}, {kind: "(", contents: "("},
             {kind: ")", contents: ")"}, {kind: ")", contents: ")"}, {kind: ";", contents: ";"},
-            {kind: "identifier", contents: "DELETE"}, {kind: "from", contents: "FROM"},
+            {kind: "delete", contents: "DELETE"}, {kind: "from", contents: "FROM"},
             {kind: "identifier", contents: "database2"}, {kind: ".", contents: "."},
             {kind: "identifier", contents: "logs"}, {kind: "where", contents: "WHERE"},
             {kind: "identifier", contents: "id"}, {kind: "<", contents: "<"},
             {kind: "int", contents: "1000"}, {kind: ";", contents: ";"}
-        ]
+        ],
+        expectedAst: `[
+          { "kind": "use", "database": "database1"},
+          { "kind": "select", "table": {"name": "users"},
+            "columns": [
+              {"kind": "identifier", "contents": "id"},
+              {"kind": "identifier", "contents": "name"},
+              {"kind": "identifier", "contents": "address"}
+            ],
+            "whereCondition": {"kind": "unary", "operator": "is not null",
+              "operand": {"kind": "identifier", "name": "is_customer"}
+            },
+            "orderBy": [{"kind": "identifier", "contents": "created"}]
+          },
+          { "kind": "insert", "table": { "name": "user_notes" },
+            "columns": [
+              { "kind": "identifier", "contents": "id" },
+              { "kind": "identifier", "contents": "user id" },
+              { "kind": "identifier", "contents": "note" },
+              { "kind": "identifier", "contents": "created" }
+            ],
+            "values": [
+              {"kind": "intLiteral", "value": "1"},
+              {"kind": "intLiteral", "value": "1"},
+              {"kind": "stringLiteral", "value": "Note 1"},
+              {"kind": "now"}
+            ]
+          },
+          { "kind": "delete", "table": {"database": "database2", "name": "logs"},
+            "whereCondition": {
+              "kind": "binary",
+              "operator": "<",
+              "leftOperand": {"kind": "identifier", "name": "id"},
+              "rightOperand": { "kind": "intLiteral", "value": "1000"}
+            }
+          }]`
     },
     {
         name: "ANSI quotes",
@@ -55,7 +93,8 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         expectedTokens: [
             {kind: "select", contents: "SELECT"}, {kind: "*", contents: "*"},
             {kind: "from", contents: "FROM"}, {kind: "identifier", contents: "my table"}
-        ]
+        ],
+        expectedAst: `[{ "kind": "select", "table": {"name": "my table"}, "columns": "*", "orderBy": []}]`
     },
     {
         name: "lower case keywords",
@@ -65,6 +104,7 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "select", contents: "select"}, {kind: "*", contents: "*"},
             {kind: "from", contents: "from"}, {kind: "identifier", contents: "table"}
         ],
+        expectedAst: `[{ "kind": "select", "table": {"name": "table"}, "columns": "*", "orderBy": []}]`,
         expectedWarnings: [
             {
                 message: "Style: Keywords should be written in ALLCAPS",
@@ -97,7 +137,56 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "identifier", contents: "y"}, {kind: "and", contents: "AND"},
             {kind: "identifier", contents: "x"}, {kind: "<=", contents: "<="},
             {kind: "identifier", contents: "y"}
-        ]
+        ],
+        expectedAst: `[{
+            "kind": "select", "table": {"name": "foo"}, "columns": "*",
+            "whereCondition": { "kind": "binary", "operator": "or",
+              "leftOperand": { "kind": "binary", "operator": "and",
+                "leftOperand": { "kind": "binary", "operator": "<>",
+                  "leftOperand": { "kind": "binary", "operator": "-",
+                    "leftOperand": { "kind": "binary", "operator": "+",
+                      "leftOperand": { "kind": "binary", "operator": "*",
+                        "leftOperand": { "kind": "identifier", "name": "x" },
+                        "rightOperand": { "kind": "identifier", "name": "y" }
+                      },
+                      "rightOperand": { "kind": "identifier", "name": "z" }
+                    },
+                    "rightOperand": { "kind": "binary", "operator": "/",
+                      "leftOperand": { "kind": "identifier", "name": "a" },
+                      "rightOperand": { "kind": "identifier", "name": "b" }
+                    }
+                  },
+                  "rightOperand": { "kind": "binary", "operator": "+",
+                    "leftOperand": { "kind": "binary", "operator": "*",
+                      "leftOperand": { "kind": "binary", "operator": "%",
+                        "leftOperand": { "kind": "identifier", "name": "c" },
+                        "rightOperand": { "kind": "identifier", "name": "d" }
+                      },
+                      "rightOperand": { "kind": "identifier", "name": "e" }
+                    },
+                    "rightOperand": { "kind": "intLiteral", "value": "42" }
+                  }
+                },
+                "rightOperand": { "kind": "binary", "operator": ">=",
+                  "leftOperand": { "kind": "identifier", "name": "x" },
+                  "rightOperand": { "kind": "identifier", "name": "y" }
+                }
+              },
+              "rightOperand": { "kind": "binary", "operator": "and",
+                "leftOperand": { "kind": "unary", "operator": "not",
+                  "operand": { "kind": "binary", "operator": "<",
+                    "leftOperand": { "kind": "identifier", "name": "z" },
+                    "rightOperand": { "kind": "identifier", "name": "y" }
+                  }
+                },
+                "rightOperand": { "kind": "binary", "operator": "<=",
+                  "leftOperand": { "kind": "identifier", "name": "x" },
+                  "rightOperand": { "kind": "identifier", "name": "y" }
+                }
+              }
+            },
+            "orderBy": []
+          }]`
     },
     {
         name: "like",
@@ -108,7 +197,14 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "from", contents: "FROM"}, {kind: "identifier", contents: "foo"},
             {kind: "where", contents: "WHERE"}, {kind: "identifier", contents: "name"},
             {kind: "like", contents: "LIKE"}, {kind: "string", contents: "Hans"}
-        ]
+        ],
+        expectedAst: `[{ "kind": "select", "table": {"name": "foo"}, "columns": "*",
+            "whereCondition": { "kind": "binary", "operator": "like",
+              "leftOperand": { "kind": "identifier", "name": "name" },
+              "rightOperand": { "kind": "stringLiteral", "value": "Hans" }
+            },
+            "orderBy": []
+          }]`
     },
     {
         name: "not like",
@@ -120,7 +216,14 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "where", contents: "WHERE"}, {kind: "identifier", contents: "name"},
             {kind: "not", contents: "NOT"}, {kind: "like", contents: "LIKE"},
             {kind: "string", contents: "Hans"}
-        ]
+        ],
+        expectedAst: `[{ "kind": "select", "table": {"name": "foo"}, "columns": "*",
+            "whereCondition": { "kind": "binary", "operator": "not like",
+              "leftOperand": { "kind": "identifier", "name": "name" },
+              "rightOperand": { "kind": "stringLiteral", "value": "Hans" }
+            },
+            "orderBy": []
+          }]`
     },
     {
         name: "unclosed string",
@@ -132,6 +235,13 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "where", contents: "WHERE"}, {kind: "identifier", contents: "name"},
             {kind: "=", contents: "="}, {kind: "string", contents: "Hans"}
         ],
+        expectedAst: `[{ "kind": "select", "table": {"name": "foo"}, "columns": "*",
+            "whereCondition": { "kind": "binary", "operator": "=",
+              "leftOperand": { "kind": "identifier", "name": "name" },
+              "rightOperand": { "kind": "stringLiteral", "value": "Hans" }
+            },
+            "orderBy": []
+          }]`,
         expectedErrors: [
             {
                 message: "Unclosed quote",
@@ -148,11 +258,12 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             {kind: "where", contents: "WHERE"}, {kind: "identifier", contents: "id"},
             {kind: ">", contents: ">"}, {kind: "int", contents: "42"}
         ],
-        // expectedErrors: [
-        //     {
-        //         message: "Unexpected input 'WHERE', expected FROM clause",
-        //         location: {from: {line: 1, column: 9}, to: {line: 1, column: 14}}
-        //     }
-        // ]
+        expectedAst: `[]`,
+        expectedErrors: [
+            {
+                message: "Unexpected input 'WHERE', expected FROM clause",
+                location: {from: {line: 1, column: 9}, to: {line: 1, column: 14}}
+            }
+        ]
     }
 ];

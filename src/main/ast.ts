@@ -20,16 +20,18 @@ export class UseCommand {
 
 export class SelectCommand {
     public readonly kind: "select" = "select";
-    public readonly columns: string[]|"*";
+    public readonly columns: Token[]|"*";
     public readonly table: TableName;
     public readonly whereCondition: Expression|undefined;
+    public readonly orderBy: Token[];
     public readonly location: sourceLocation.Range;
 
-    constructor(table: TableName, columns: string[]|"*", whereCondition: Expression|undefined,
-                location: sourceLocation.Range) {
+    constructor(table: TableName, columns: Token[]|"*", whereCondition: Expression|undefined,
+                orderBy: Token[], location: sourceLocation.Range) {
         this.table = table;
         this.columns = columns;
         this.whereCondition = whereCondition;
+        this.orderBy = orderBy;
         this.location = location;
     }
 }
@@ -37,11 +39,11 @@ export class SelectCommand {
 export class InsertCommand {
     public readonly kind: "insert" = "insert";
     public readonly table: TableName;
-    public readonly columns: string[];
+    public readonly columns: Token[];
     public readonly values: ConstantExpression[];
     public readonly location: sourceLocation.Range;
 
-    constructor(table: TableName, columns: string[], values: ConstantExpression[],
+    constructor(table: TableName, columns: Token[], values: ConstantExpression[],
                 location: sourceLocation.Range) {
         this.table = table;
         this.columns = columns;
@@ -95,12 +97,21 @@ export class Now {
     public readonly kind: "now" = "now";
     public readonly location: sourceLocation.Range;
 
-    constructor(token: Token) {
-        this.location = token.location;
+    constructor(location: sourceLocation.Range) {
+        this.location = location;
     }
 }
 
-type ConstantExpression = IntLiteral | StringLiteral | Now;
+export class Null {
+    public readonly kind: "null" = "null";
+    public readonly location: sourceLocation.Range;
+
+    constructor(location: sourceLocation.Range) {
+        this.location = location;
+    }
+}
+
+export type ConstantExpression = IntLiteral | StringLiteral | Now | Null;
 
 export class Identifier {
     public readonly kind: "identifier" = "identifier";
@@ -113,27 +124,35 @@ export class Identifier {
     }
 }
 
+export type UnaryOperator = "not" | "-" | "is null" | "is not null";
+
 export class UnaryOperation {
     public readonly kind: "unary" = "unary";
-    public readonly operator: string;
+    public readonly operator: UnaryOperator;
     public readonly operand: Expression;
     public readonly location: sourceLocation.Range;
 
-    constructor(operator: string, operand: Expression, location: sourceLocation.Range) {
+    constructor(operator: UnaryOperator, operand: Expression, location: sourceLocation.Range) {
         this.operator = operator;
         this.operand = operand;
         this.location = location;
     }
 }
 
+type BinaryOperator =
+    "or" | "and" | "like" | "not like" | "=" | "<>" | ">=" | ">" | "<" | "<=" |
+    "+" | "-" | "*" | "/" | "%"
+;
+
 export class BinaryOperation {
-    public readonly kind: "unary" = "unary";
-    public readonly operator: string;
+    public readonly kind: "binary" = "binary";
+    public readonly operator: BinaryOperator;
     public readonly leftOperand: Expression;
     public readonly rightOperand: Expression;
     public readonly location: sourceLocation.Range;
 
-    constructor(operator: string, leftOperand: Expression, rightOperand: Expression, location: sourceLocation.Range) {
+    constructor(operator: BinaryOperator, leftOperand: Expression, rightOperand: Expression,
+                location: sourceLocation.Range) {
         this.operator = operator;
         this.leftOperand = leftOperand;
         this.rightOperand = rightOperand;

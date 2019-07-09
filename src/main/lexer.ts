@@ -49,7 +49,7 @@ function isSpace(char: string) {
 
 const keywords = [
     "use", "select", "from", "where", "is", "not", "null", "and", "or", "like", "order", "by",
-    "insert", "into", "values"
+    "insert", "into", "values", "delete"
 ];
 
 export enum QuoteType {
