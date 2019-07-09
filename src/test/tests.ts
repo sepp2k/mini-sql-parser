@@ -24,8 +24,8 @@ for (const example of examples) {
         });
         it("should produce the correct AST", () => {
             // Parse and reserialize the expected AST to get rid of spacing and order differences
-            const expected = JSON.stringify(JSON.parse(example.expectedAst));
-            const actual = JSON.stringify(result.commands, filterKeys);
+            const expected = JSON.stringify(JSON.parse(example.expectedAst), undefined, 2);
+            const actual = JSON.stringify(result.commands, filterKeys, 2);
             assert.equal(actual, expected);
         });
         it("should produce the correct set of warnings", () => {
