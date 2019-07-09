@@ -54,21 +54,21 @@ DELETE FROM database2.logs WHERE id < 1000;`,
           { "kind": "use", "database": "database1"},
           { "kind": "select", "table": {"name": "users"},
             "columns": [
-              {"kind": "identifier", "contents": "id"},
-              {"kind": "identifier", "contents": "name"},
-              {"kind": "identifier", "contents": "address"}
+              {"kind": "column", "name": "id"},
+              {"kind": "column", "name": "name"},
+              {"kind": "column", "name": "address"}
             ],
             "whereCondition": {"kind": "unary", "operator": "is not null",
-              "operand": {"kind": "identifier", "name": "is_customer"}
+              "operand": {"kind": "column", "name": "is_customer"}
             },
-            "orderBy": [{"kind": "identifier", "contents": "created"}]
+            "orderBy": [{"kind": "column", "name": "created"}]
           },
           { "kind": "insert", "table": { "name": "user_notes" },
             "columns": [
-              { "kind": "identifier", "contents": "id" },
-              { "kind": "identifier", "contents": "user id" },
-              { "kind": "identifier", "contents": "note" },
-              { "kind": "identifier", "contents": "created" }
+              { "kind": "column", "name": "id" },
+              { "kind": "column", "name": "user id" },
+              { "kind": "column", "name": "note" },
+              { "kind": "column", "name": "created" }
             ],
             "values": [
               {"kind": "intLiteral", "value": "1"},
@@ -81,7 +81,7 @@ DELETE FROM database2.logs WHERE id < 1000;`,
             "whereCondition": {
               "kind": "binary",
               "operator": "<",
-              "leftOperand": {"kind": "identifier", "name": "id"},
+              "leftOperand": {"kind": "column", "name": "id"},
               "rightOperand": { "kind": "intLiteral", "value": "1000"}
             }
           }]`
@@ -108,10 +108,12 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         expectedWarnings: [
             {
                 message: "Style: Keywords should be written in ALLCAPS",
-                location: {from: {line: 1, column: 0}, to: {line: 1, column: 6}}},
+                location: {from: {line: 1, column: 0}, to: {line: 1, column: 6}}
+            },
             {
                 message: "Style: Keywords should be written in ALLCAPS",
-                location: {from: {line: 1, column: 9}, to: {line: 1, column: 13}}}
+                location: {from: {line: 1, column: 9}, to: {line: 1, column: 13}}
+            }
         ]
     },
     {
@@ -146,42 +148,42 @@ DELETE FROM database2.logs WHERE id < 1000;`,
                   "leftOperand": { "kind": "binary", "operator": "-",
                     "leftOperand": { "kind": "binary", "operator": "+",
                       "leftOperand": { "kind": "binary", "operator": "*",
-                        "leftOperand": { "kind": "identifier", "name": "x" },
-                        "rightOperand": { "kind": "identifier", "name": "y" }
+                        "leftOperand": { "kind": "column", "name": "x" },
+                        "rightOperand": { "kind": "column", "name": "y" }
                       },
-                      "rightOperand": { "kind": "identifier", "name": "z" }
+                      "rightOperand": { "kind": "column", "name": "z" }
                     },
                     "rightOperand": { "kind": "binary", "operator": "/",
-                      "leftOperand": { "kind": "identifier", "name": "a" },
-                      "rightOperand": { "kind": "identifier", "name": "b" }
+                      "leftOperand": { "kind": "column", "name": "a" },
+                      "rightOperand": { "kind": "column", "name": "b" }
                     }
                   },
                   "rightOperand": { "kind": "binary", "operator": "+",
                     "leftOperand": { "kind": "binary", "operator": "*",
                       "leftOperand": { "kind": "binary", "operator": "%",
-                        "leftOperand": { "kind": "identifier", "name": "c" },
-                        "rightOperand": { "kind": "identifier", "name": "d" }
+                        "leftOperand": { "kind": "column", "name": "c" },
+                        "rightOperand": { "kind": "column", "name": "d" }
                       },
-                      "rightOperand": { "kind": "identifier", "name": "e" }
+                      "rightOperand": { "kind": "column", "name": "e" }
                     },
                     "rightOperand": { "kind": "intLiteral", "value": "42" }
                   }
                 },
                 "rightOperand": { "kind": "binary", "operator": ">=",
-                  "leftOperand": { "kind": "identifier", "name": "x" },
-                  "rightOperand": { "kind": "identifier", "name": "y" }
+                  "leftOperand": { "kind": "column", "name": "x" },
+                  "rightOperand": { "kind": "column", "name": "y" }
                 }
               },
               "rightOperand": { "kind": "binary", "operator": "and",
                 "leftOperand": { "kind": "unary", "operator": "not",
                   "operand": { "kind": "binary", "operator": "<",
-                    "leftOperand": { "kind": "identifier", "name": "z" },
-                    "rightOperand": { "kind": "identifier", "name": "y" }
+                    "leftOperand": { "kind": "column", "name": "z" },
+                    "rightOperand": { "kind": "column", "name": "y" }
                   }
                 },
                 "rightOperand": { "kind": "binary", "operator": "<=",
-                  "leftOperand": { "kind": "identifier", "name": "x" },
-                  "rightOperand": { "kind": "identifier", "name": "y" }
+                  "leftOperand": { "kind": "column", "name": "x" },
+                  "rightOperand": { "kind": "column", "name": "y" }
                 }
               }
             },
@@ -200,7 +202,7 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         ],
         expectedAst: `[{ "kind": "select", "table": {"name": "foo"}, "columns": "*",
             "whereCondition": { "kind": "binary", "operator": "like",
-              "leftOperand": { "kind": "identifier", "name": "name" },
+              "leftOperand": { "kind": "column", "name": "name" },
               "rightOperand": { "kind": "stringLiteral", "value": "Hans" }
             },
             "orderBy": []
@@ -219,11 +221,37 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         ],
         expectedAst: `[{ "kind": "select", "table": {"name": "foo"}, "columns": "*",
             "whereCondition": { "kind": "binary", "operator": "not like",
-              "leftOperand": { "kind": "identifier", "name": "name" },
+              "leftOperand": { "kind": "column", "name": "name" },
               "rightOperand": { "kind": "stringLiteral", "value": "Hans" }
             },
             "orderBy": []
           }]`
+    },
+    {
+        name: "complex column names",
+        code: "SELECT db.table.column FROM db.table WHERE db.table.column = table.column2",
+        quoteType: lexer.QuoteType.DOUBLE_QUOTED_STRINGS,
+        expectedTokens: [
+            {kind: "select", contents: "SELECT"}, {kind: "identifier", contents: "db"}, {kind:".", contents: "."},
+            {kind: "identifier", contents: "table"}, {kind: ".", contents: "."},
+            {kind: "identifier", contents: "column"}, {kind: "from", contents: "FROM"},
+            {kind: "identifier", contents: "db"}, {kind: ".", contents: "."}, {kind: "identifier", contents: "table"},
+            {kind: "where", contents: "WHERE"}, {kind: "identifier", contents: "db"}, {kind: ".", contents: "."},
+            {kind: "identifier", contents: "table"}, {kind: ".", contents: "."},
+            {kind: "identifier", contents: "column"}, {kind: "=", contents: "="},
+            {kind: "identifier", contents: "table"}, {kind: ".", contents: "."},
+            {kind: "identifier", contents: "column2"}
+        ],
+        expectedAst: `[
+          {"kind": "select", "table": {"database": "db", "name": "table"},
+            "columns": [{"kind": "column", "table": {"database": "db", "name": "table"}, "name": "column"}],
+            "whereCondition": {"kind": "binary", "operator": "=",
+              "leftOperand": {"kind": "column", "table": {"database": "db", "name": "table"}, "name": "column"},
+              "rightOperand": {"kind": "column", "table": {"name": "table"}, "name": "column2"}
+            },
+            "orderBy": []
+          }
+        ]`
     },
     {
         name: "unclosed string",
@@ -237,7 +265,7 @@ DELETE FROM database2.logs WHERE id < 1000;`,
         ],
         expectedAst: `[{ "kind": "select", "table": {"name": "foo"}, "columns": "*",
             "whereCondition": { "kind": "binary", "operator": "=",
-              "leftOperand": { "kind": "identifier", "name": "name" },
+              "leftOperand": { "kind": "column", "name": "name" },
               "rightOperand": { "kind": "stringLiteral", "value": "Hans" }
             },
             "orderBy": []

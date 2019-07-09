@@ -20,12 +20,11 @@ export function parse(lexResult: lexer.Result): Result {
 
 // Use a class for syntax errors, so that we can throw it in the parser and then recognize it
 // using `instanceof`
-class SyntaxError extends Error {
+class SyntaxError {
     public message: string;
     public location: sourceLocation.Range;
 
     constructor(actual: lexer.Token, expected: string) {
-        super();
         const prettyActual = actual.kind === "eof" ? "end of input" : `input '${actual.contents}'`;
         this.message = `Unexpected ${prettyActual}, expected ${expected}`;
         this.location = actual.location;
@@ -158,7 +157,7 @@ class Parser {
         return new ast.DeleteCommand(table, whereCondition, location);
     }
 
-    private parseColumnNamesOrStar(): lexer.Token[]|"*" {
+    private parseColumnNamesOrStar(): ast.Column[]|"*" {
         if (this.peekToken().kind === "*") {
             this.readToken();
             return "*";
@@ -167,15 +166,39 @@ class Parser {
         }
     }
 
-    private parseColumnNames(): lexer.Token[] {
-        const firstId = this.expect("identifier", "identifier or '*'");
-        const ids = [firstId];
+    private parseColumnNames(): ast.Column[] {
+        const firstColumn = this.parseColumnName(this.expect("identifier", "identifier or '*'"));
+        const columns = [firstColumn];
         while (this.peekToken().kind === ",") {
             this.readToken();
-            const id = this.expect("identifier", "identifier or '*'");
-            ids.push(id);
+            const column = this.parseColumnName(this.expect("identifier"));
+            columns.push(column);
         }
-        return ids;
+        return columns;
+    }
+
+    // parseColumnName takes the id as the first argument because later in the code I'll need to
+    // parse a column name after having already read its first ID
+    private parseColumnName(id1: lexer.Token): ast.Column {
+        if (this.peekToken().kind === ".") {
+            this.readToken();
+            const id2 = this.expect("identifier");
+            if (this.peekToken().kind === ".") {
+                this.readToken();
+                const id3 = this.expect("identifier");
+                const tableName = {
+                    database: id1.contents,
+                    name: id2.contents,
+                    location: this.loc(id1, id2)
+                };
+                return new ast.Column(tableName, id3.contents, this.loc(id1, id3));
+            } else {
+                const tableName = {database: undefined, name: id1.contents, location: id1.location};
+                return new ast.Column(tableName, id2.contents, this.loc(id1, id2));
+            }
+        } else {
+            return new ast.Column(undefined, id1.contents, id1.location);
+        }
     }
 
     private parseValueList(): ast.ConstantExpression[] {
@@ -215,7 +238,7 @@ class Parser {
         return this.parseExpression();
     }
 
-    private parseOrderByOpt(): lexer.Token[] {
+    private parseOrderByOpt(): ast.Column[] {
         const kind = this.peekToken().kind;
         if (kind === "eof" || kind === ";") {
             return [];
@@ -354,12 +377,12 @@ class Parser {
                             message: "The only supported function is NOW()",
                             location: token.location
                         });
-                        return new ast.Identifier(token);
+                        return new ast.Column(undefined, token.contents, token.location);
                     } else {
                         return new ast.Now(this.loc(token, cp));
                     }
                 } else {
-                    return new ast.Identifier(token);
+                    return this.parseColumnName(token);
                 }
 
             case "(":

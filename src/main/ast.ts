@@ -20,14 +20,14 @@ export class UseCommand {
 
 export class SelectCommand {
     public readonly kind: "select" = "select";
-    public readonly columns: Token[]|"*";
+    public readonly columns: Column[]|"*";
     public readonly table: TableName;
     public readonly whereCondition: Expression|undefined;
-    public readonly orderBy: Token[];
+    public readonly orderBy: Column[];
     public readonly location: sourceLocation.Range;
 
-    constructor(table: TableName, columns: Token[]|"*", whereCondition: Expression|undefined,
-                orderBy: Token[], location: sourceLocation.Range) {
+    constructor(table: TableName, columns: Column[]|"*", whereCondition: Expression|undefined,
+                orderBy: Column[], location: sourceLocation.Range) {
         this.table = table;
         this.columns = columns;
         this.whereCondition = whereCondition;
@@ -39,11 +39,11 @@ export class SelectCommand {
 export class InsertCommand {
     public readonly kind: "insert" = "insert";
     public readonly table: TableName;
-    public readonly columns: Token[];
+    public readonly columns: Column[];
     public readonly values: ConstantExpression[];
     public readonly location: sourceLocation.Range;
 
-    constructor(table: TableName, columns: Token[], values: ConstantExpression[],
+    constructor(table: TableName, columns: Column[], values: ConstantExpression[],
                 location: sourceLocation.Range) {
         this.table = table;
         this.columns = columns;
@@ -113,14 +113,16 @@ export class Null {
 
 export type ConstantExpression = IntLiteral | StringLiteral | Now | Null;
 
-export class Identifier {
-    public readonly kind: "identifier" = "identifier";
+export class Column {
+    public readonly kind: "column" = "column";
+    public readonly table: TableName|undefined;
     public readonly name: string;
     public readonly location: sourceLocation.Range;
 
-    constructor(token: Token) {
-        this.name = token.contents;
-        this.location = token.location;
+    constructor(table: TableName|undefined, name: string, location: sourceLocation.Range) {
+        this.table = table;
+        this.name = name;
+        this.location = location;
     }
 }
 
@@ -160,4 +162,4 @@ export class BinaryOperation {
     }
 }
 
-export type Expression = ConstantExpression | Identifier | UnaryOperation | BinaryOperation;
+export type Expression = ConstantExpression | Column | UnaryOperation | BinaryOperation;
