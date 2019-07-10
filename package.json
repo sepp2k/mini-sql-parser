@@ -23,6 +23,7 @@
     "@babel/preset-env": "^7.5.2",
     "@types/mocha": "^5.2.7",
     "@types/source-map-support": "^0.5.0",
+    "@types/vis": "^4.21.18",
     "css-loader": "^3.0.0",
     "file-loader": "^4.0.0",
     "mocha": "^6.1.4",

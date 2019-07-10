@@ -9,6 +9,7 @@ import "codemirror/mode/sql/sql";
 import "./index.html";
 import "./style.css";
 
+import {drawAst} from "../../gen/babel/web/draw-ast";
 import {examples} from "../../gen/babel/lib/examples";
 import * as lexer from "../../gen/babel/lib/lexer";
 import * as parser from "../../gen/babel/lib/parser";
@@ -81,5 +82,10 @@ $(document).ready(() => {
     $("#jsonButton").click(() => {
         const result = parse(editor.getValue());
         $("#parseResult").text(util.prettyPrint(result.commands));
+    });
+
+    $("#visButton").click(() => {
+        const result = parse(editor.getValue());
+        drawAst(result.commands, $("#parseResult")[0]);
     });
 });
