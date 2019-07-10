@@ -6,7 +6,7 @@ export function drawAst(commands: ast.Command[], container: HTMLElement): vis.Ne
     const visualizer = new AstVisualizer();
     const data = visualizer.drawCommands(commands);
     const opts: vis.Options = {};
-    return new vis.Network(container, data, {layout: {hierarchical: true}});
+    return new vis.Network(container, data, {layout: {hierarchical: {sortMethod: "directed"}}});
 }
 
 class AstVisualizer {
