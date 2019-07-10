@@ -13546,7 +13546,7 @@ exports.push([module.i, "/* BASICS */\n\n.CodeMirror {\n  /* Set height, width, 
 
 exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "#parseResult {\n    height: 500px;\n}", ""]);
+exports.push([module.i, "html, body {\n  height: 100%;\n}\n", ""]);
 
 
 /***/ }),
@@ -84810,25 +84810,35 @@ jquery__WEBPACK_IMPORTED_MODULE_1___default()(document).ready(() => {
         editor.setOption("lint", lint);
     });
 
+    const resultArea = jquery__WEBPACK_IMPORTED_MODULE_1___default()("#parseResult");
+
     jquery__WEBPACK_IMPORTED_MODULE_1___default()("#tokensButton").click(() => {
         const lexResult = lex(editor.getValue());
         let output = "";
         for (const token of lexResult.tokens) {
             output += `${token.kind}: ${token.contents}\n`;
         }
-        jquery__WEBPACK_IMPORTED_MODULE_1___default()("#parseResult").text(output);
+        resultArea.text(output);
     });
 
     jquery__WEBPACK_IMPORTED_MODULE_1___default()("#jsonButton").click(() => {
         const result = parse(editor.getValue());
-        jquery__WEBPACK_IMPORTED_MODULE_1___default()("#parseResult").text(_gen_babel_lib_util__WEBPACK_IMPORTED_MODULE_12__["prettyPrint"](result.commands));
+        resultArea.text(_gen_babel_lib_util__WEBPACK_IMPORTED_MODULE_12__["prettyPrint"](result.commands));
     });
 
     jquery__WEBPACK_IMPORTED_MODULE_1___default()("#visButton").click(() => {
         const result = parse(editor.getValue());
-        Object(_gen_babel_web_draw_ast__WEBPACK_IMPORTED_MODULE_8__["drawAst"])(result.commands, jquery__WEBPACK_IMPORTED_MODULE_1___default()("#parseResult")[0]);
+        Object(_gen_babel_web_draw_ast__WEBPACK_IMPORTED_MODULE_8__["drawAst"])(result.commands, resultArea[0]);
     });
+
+    function resizeResultArea() {
+        resultArea.height(jquery__WEBPACK_IMPORTED_MODULE_1___default()(window).height() - resultArea.offset().top - 25);
+    }
+
+    resizeResultArea();
+    window.onresize = resizeResultArea;
 });
+
 
 /***/ }),
 
