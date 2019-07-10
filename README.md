@@ -72,3 +72,16 @@ The following expressions are allowed in a `WHERE` clause:
 * The arithmetic operators `+`, `-` (including unary `-`), `*`, `/` and `%`
 * The name of a column
 * Any constant expression listed in the list above
+
+## The Web Editor
+
+The web editor is implemented using [CodeMirror](https://codemirror.net/) and parses the code in the
+background using my lexer and parser. Errors and warnings produced by the lexer and/or parser will be
+displayed in the editor using squiggly lines in the code and error/warning symbols on the left. Either
+one can be hovered with the mouse to view the error/warning messages.
+
+## The Visualizer
+
+Clicking the "Graphical AST" button in the web editor will draw a graphical representation of the
+AST using the [vis.js library](https://visjs.org/). The code for this can be found in
+[draw-ast.ts](src/web/draw-ast.ts) and can serve as an example of how to traverse the AST.
