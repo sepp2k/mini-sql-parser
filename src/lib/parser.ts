@@ -349,7 +349,7 @@ class Parser {
     private parseUnaryMinus(): ast.Expression {
         if (this.peekToken().kind === "-") {
             const not = this.readToken();
-            const arg = this.parseNot();
+            const arg = this.parseUnaryMinus();
             return new ast.UnaryOperation("-", arg, this.loc(not, arg));
         } else {
             return this.parsePrimaryExpression();
