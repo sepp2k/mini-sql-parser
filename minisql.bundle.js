@@ -13546,7 +13546,7 @@ exports.push([module.i, "/* BASICS */\n\n.CodeMirror {\n  /* Set height, width, 
 
 exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
 // Module
-exports.push([module.i, "html, body {\n    height: 100%;\n}\n\nbody {\n    display: flex;\n    flex-flow: column;\n    background-color: grey;\n}\n\n#parseResult {\n    height: 100%;\n    background-color: white;\n}\n", ""]);
+exports.push([module.i, "#parseResult {\n    height: 500px;\n}", ""]);
 
 
 /***/ }),
