@@ -6,7 +6,8 @@
     "tsc": "tsc",
     "babel": "babel gen/js --out-dir gen/babel",
     "webpack": "webpack",
-    "build": "npm run tsc && npm run babel && npm run webpack"
+    "build": "npm run tsc && npm run babel && npm run webpack",
+    "deploy": "npm run build && gh-pages -d gen/web"
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
@@ -26,6 +27,7 @@
     "@types/vis": "^4.21.18",
     "css-loader": "^3.0.0",
     "file-loader": "^4.0.0",
+    "gh-pages": "^2.0.1",
     "mocha": "^6.1.4",
     "source-map-support": "^0.5.12",
     "style-loader": "^0.23.1",
