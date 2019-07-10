@@ -70,22 +70,31 @@ $(document).ready(() => {
         editor.setOption("lint", lint);
     });
 
+    const resultArea = $("#parseResult");
+
     $("#tokensButton").click(() => {
         const lexResult = lex(editor.getValue());
         let output = "";
         for (const token of lexResult.tokens) {
             output += `${token.kind}: ${token.contents}\n`;
         }
-        $("#parseResult").text(output);
+        resultArea.text(output);
     });
 
     $("#jsonButton").click(() => {
         const result = parse(editor.getValue());
-        $("#parseResult").text(util.prettyPrint(result.commands));
+        resultArea.text(util.prettyPrint(result.commands));
     });
 
     $("#visButton").click(() => {
         const result = parse(editor.getValue());
-        drawAst(result.commands, $("#parseResult")[0]);
+        drawAst(result.commands, resultArea[0]);
     });
+
+    function resizeResultArea() {
+        resultArea.height($(window).height() - resultArea.offset().top - 25);
+    }
+
+    resizeResultArea();
+    window.onresize = resizeResultArea;
 });
