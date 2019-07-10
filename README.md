@@ -2,6 +2,8 @@
 
 This is a hand-written parser for a minimal SQL dialect, written in TypeScript.
 
+You can play with it [here](https://sepp2k.github.io/mini-sql-parser/).
+
 ## The Lexer
 
 The lexer is located in [lexer.ts](src/lib/lexer.ts) and splits the input into an array of
