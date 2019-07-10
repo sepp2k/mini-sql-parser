@@ -32,13 +32,17 @@ $(document).ready(() => {
         $("#examples").append(button);
     }
 
-    function parse(src) {
+    function lex(src) {
         const ansiEscapes =
             $("#ansiQuotes").is(":checked") ?
             lexer.QuoteType.ANSI_QUOTES :
             lexer.QuoteType.DOUBLE_QUOTED_STRINGS
-            ;
-        return parser.parse(lexer.lex(src, ansiEscapes));
+        ;
+        return lexer.lex(src, ansiEscapes);
+    }
+
+    function parse(src) {
+        return parser.parse(lex(src));
     }
 
     function diagnosticToLintMarker(diagnostic, severity) {
@@ -65,7 +69,16 @@ $(document).ready(() => {
         editor.setOption("lint", lint);
     });
 
-    $("#parseButton").click(() => {
+    $("#tokensButton").click(() => {
+        const lexResult = lex(editor.getValue());
+        let output = "";
+        for (const token of lexResult.tokens) {
+            output += `${token.kind}: ${token.contents}\n`;
+        }
+        $("#parseResult").text(output);
+    });
+
+    $("#jsonButton").click(() => {
         const result = parse(editor.getValue());
         $("#parseResult").text(util.prettyPrint(result.commands));
     });
