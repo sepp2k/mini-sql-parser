@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
-    "codemirror": "^5.48.0",
+    "codemirror": "^5.58.2",
     "jquery": "^3.4.1",
     "node-ts": "^5.0.1",
     "vis": "^4.21.0"
