@@ -25,16 +25,16 @@
     "@types/mocha": "^5.2.7",
     "@types/source-map-support": "^0.5.0",
     "@types/vis": "^4.21.18",
-    "css-loader": "^3.0.0",
-    "file-loader": "^4.0.0",
+    "css-loader": "^6.7.3",
+    "file-loader": "^6.2.0",
     "gh-pages": "^2.0.1",
     "mocha": "^6.1.4",
     "source-map-support": "^0.5.12",
-    "style-loader": "^0.23.1",
+    "style-loader": "^3.3.1",
     "tslint": "^5.18.0",
     "typescript": "^3.5.2",
-    "url-loader": "^2.0.1",
-    "webpack": "^4.35.3",
-    "webpack-cli": "^3.3.5"
+    "url-loader": "^4.1.1",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }
